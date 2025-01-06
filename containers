@@ -60,7 +60,7 @@ while test $# -gt 0; do
       else
         containers_up
       fi
-      shift
+      exit $?
       ;;
     down|d)
       shift; SHUTDOWN_PROJ=$1
@@ -69,11 +69,11 @@ while test $# -gt 0; do
       else
         containers_down
       fi
-      shift
+      exit $?
       ;;
     status|s)
       status
-      shift
+      exit $?
       ;;
     --help|-h|*)
       echo ""

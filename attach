@@ -17,7 +17,7 @@ do
   proj=$(echo $config | cut -d':' -f 1)
   repo=$(echo $config | cut -d':' -f 2)
 
-  if [ "$PROJ" == "$proj" ]; then
+  if [ "$PROJ" = "$proj" ]; then
     PREFIX=$repo
   fi
 done
@@ -27,7 +27,7 @@ if [ "$PROJ_ENV" ]; then
   FILE=".env_${PROJ_ENV}"
   # 'DEFAULT_ENV' is the default environment.
   # If .env_$DEFAULT_ENV doesn't exist, use .env
-  if [ "$PROJ_ENV" == "$DEFAULT_ENV" ] && [ ! -f "$PROJ/$FILE" ]; then
+  if [ "$PROJ_ENV" = "$DEFAULT_ENV" ] && [ ! -f "$PROJ/$FILE" ]; then
     FILE=".env"
   fi
 else
