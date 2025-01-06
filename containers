@@ -1,0 +1,104 @@
+#!shell_finder.sh
+set -e
+
+source .rtc_config
+
+# Ensures I can run this script from other paths
+cd "$(dirname "$0")"
+
+
+get_proj_names() {
+  for conf in $(echo $RTC_PROJECTS)
+  do
+    proj=$(echo $conf | cut -d':' -f 1)
+    RTC_PROJ_NAMES="$RTC_PROJ_NAMES $proj"
+  done
+}
+
+containers_up() {
+  echo "Starting up containers . . ."
+  get_proj_names
+  for i in $(echo $RTC_PROJ_NAMES)
+  do
+    start "$i"
+  done
+}
+
+containers_down() {
+  echo "Shutting down containers . . ."
+  get_proj_names
+  for i in $(echo "$RTC_PROJ_NAMES")
+  do
+    shutdown "$i"
+  done
+}
+
+start() {
+  if [ -d "$1" ]; then
+    echo "Starting $1 . . ."
+    docker compose -f "$1/docker-compose.yml" up -d
+  fi
+}
+
+shutdown() {
+  if [ -d "$1" ]; then
+    echo "Shutting down $1 . . ."
+    docker compose -f "$1/docker-compose.yml" down -t 0
+  fi
+}
+
+status() {
+  docker ps --format "table {{.Names}}\t {{.Ports}}"
+}
+
+while test $# -gt 0; do
+  case "$1" in
+    up|u)
+      shift; START_PROJ=$1
+      if [ -n "$START_PROJ" ]; then
+        start "$START_PROJ"
+      else
+        containers_up
+      fi
+      shift
+      ;;
+    down|d)
+      shift; SHUTDOWN_PROJ=$1
+      if [ -n "$SHUTDOWN_PROJ" ]; then
+        shutdown "$SHUTDOWN_PROJ"
+      else
+        containers_down
+      fi
+      shift
+      ;;
+    status|s)
+      status
+      shift
+      ;;
+    --help|-h|*)
+      echo ""
+      echo "Usage:"
+      echo "$0 up|down <project>"
+      echo ""
+      echo "Options:"
+      echo "up, u              Start all projects"
+      echo "down, d            Shutdown all projects"
+      echo "up|down <project>  Start/shutdown specified only"
+      echo "status, s          See status of running containers"
+      echo ""
+      exit 0
+      ;;
+    *)
+      echo "Unknown flag"
+      exit 1
+      ;;
+  esac
+done
+
+
+
+
+
+
+
+

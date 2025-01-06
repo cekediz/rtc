@@ -1,0 +1,51 @@
+#!shell_finder.sh
+set -e
+
+source .rtc_config
+
+bold() {
+  echo -e "\033[1m$1\033[0m"
+}
+
+PROJ=$1
+PROJ_ENV=$2
+
+DEFAULT_ENV=dev
+
+for config in $(echo $RTC_PROJECTS)
+do
+  proj=$(echo $config | cut -d':' -f 1)
+  repo=$(echo $config | cut -d':' -f 2)
+
+  if [ "$PROJ" == "$proj" ]; then
+    PREFIX=$repo
+  fi
+done
+
+# Find container env file
+if [ "$PROJ_ENV" ]; then
+  FILE=".env_${PROJ_ENV}"
+  # 'DEFAULT_ENV' is the default environment.
+  # If .env_$DEFAULT_ENV doesn't exist, use .env
+  if [ "$PROJ_ENV" == "$DEFAULT_ENV" ] && [ ! -f "$PROJ/$FILE" ]; then
+    FILE=".env"
+  fi
+else
+  PROJ_ENV=$DEFAULT_ENV
+  FILE=".env"
+fi
+ENV_FILE="$PROJ/$FILE"
+
+
+if [ "$PREFIX" ]; then
+  TARGET=$PREFIX-webserver-1
+  RTC_PROMPT="\h:\w($PROJ.$PROJ_ENV)\$ "
+  echo ""
+  echo "Connecting to $(bold $TARGET) in $(bold $PROJ_ENV) environment . . ."
+  docker exec -it --env-file "$ENV_FILE" -e PS1="$RTC_PROMPT" $TARGET /bin/ash
+else
+  echo ""
+  echo "Project not found"
+  echo "Usage: $0 <project-name>"
+  exit 1
+fi
