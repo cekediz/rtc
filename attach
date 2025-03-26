@@ -7,7 +7,7 @@ bold() {
   echo -e "\033[1m$1\033[0m"
 }
 
-PROJ=$1
+PROJ=${1%/} # also removes trailing slash
 PROJ_ENV=$2
 
 DEFAULT_ENV=dev

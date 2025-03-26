@@ -7,6 +7,7 @@ sdk:remark-health-core
 sdsa:sds-analytics-backend
 sdsa-client:sds-analytics-client
 bam-local:remark-bam-local
+elixir-sandbox:elixir-sandbox
 EOF
 )
 
